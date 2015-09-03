@@ -23,9 +23,9 @@ get '/twilio_test' do
     @client = Twilio::REST::Client.new
 
     @client.messages.create(
-        from: '+34911061281',
+        from: ENV['FROM_PHONE_NUMBER'],
         to: ENV['TEST_PHONE_NUMBER'],
-        body: 'This is a test message!'
+        body: 'This is a different test message!'
     )
     'Should have sent the message'
 end
