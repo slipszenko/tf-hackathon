@@ -20,8 +20,12 @@ post '/return_form_one' do
 
     # TODO - Generate the new form based on the place and what's available here, following vars should be from places API
     typesOfFood = Category.with_best_venues
-
+        
     choicesOptions = typesOfFood.keys.map { |key| { label: key } }
+
+    open('shitlog.out', 'a') { |f|
+        f.puts choicesOptions
+    }
 
     newFormJson = JSON.generate({
         "title" => "Type of food",
