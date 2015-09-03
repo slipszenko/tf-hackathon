@@ -1,33 +1,39 @@
-class Venue
-  attr_reader :name, :address, :rating, :place_id, :opening_hours, :google_url
-  attr_accessor :category
+class Venue < ActiveRecord::Base
+  has_many :types
+  has_many :categories
+
+  before_create :create_categories, :create_types, :set_attributes
 
   def initialize(data)
-    @address = data[:formatted_address]
-    @name = data[:name]
-    @opening_hours = data[:opening_hours]
-    @phone = data[:international_phone_number]
-    @place_id = data[:place_id]
-    @rating = data[:rating]
-    @types = data[:types]
-    @google_url = data[:url]
-    @website = data[:website]
+    @data = data
   end
 
   def open?(datetime)
-    if datetime
-      open_at?(datetime)
-    else
-      opening_hours[:open_now]
-    end
+    day = datetime.wday
+    time = "#{datetime.hour}#{datetime.min}"
   end
 
   private
 
-  def open_at?(datetime)
-    opening_times = opening_hours[:periods]
-    day = datetime.wday
-    time = "#{datetime.hour}#{datetime.min}"
+  attr_reader :data, :opening_hours
 
+  def create_categories
+    data[:categories].each { |c_name| categories.new(name: c_name) }
+  end
+
+  def create_types
+    data[:types].each { |t_name| types.new(name: t_name) }
+  end
+
+  def set_attributes
+    address = data[:formatted_address]
+    name = data[:name]
+    opening_hours = opening_hours[:periods]
+    phone = data[:international_phone_number]
+    place_id = data[:place_id]
+    rating = data[:rating]
+    types = data[:types]
+    google_url = data[:url]
+    website = data[:website]
   end
 end
