@@ -1,28 +1,39 @@
 class PlacesApiClient
   BASE_URL = 'https://maps.googleapis.com/maps/api/place'
-  TYPES = %w(food bar cafe restaurant)
+  TYPES = "food|bar|cafe|restaurant"
 
-  def find_places(coords, radius, types = default_types)
-    params = "location=#{coords}&radius=#{radius}&types=#{types || default_types}&key=#{api_key}"
-    uri = URI("#{BASE_URL}/nearbysearch/json?#{params}")
-    results_for_uri(uri)[:results]
+  attr_reader :next_page_token
+
+  def find_places(coords, radius)
+    params = "location=#{coords}&radius=#{radius}&types=#{TYPES}"
+    nearby_search(params)
+  end
+
+  def find_more_places
+    return unless token
+    params = "next_page_token=#{token}"
+    nearby_search(params)
   end
 
   def place_details(place_id)
     params = "placeid=#{place_id}&key=#{api_key}"
-    uri = URI("#{BASE_URL}/details/json?#{params}")
-    results_for_uri(uri)[:result]
+    url = "#{BASE_URL}/details/json?#{params}"
+    get_and_parse_response(url)[:result]
   end
 
   private
 
-  def results_for_uri(uri)
-    response = Net::HTTP.get(uri)
-    JSON.parse(response, symbolize_names: true)
+  def nearby_search(params)
+    url = "#{BASE_URL}/nearbysearch/json?#{params}&key=#{api_key}"
+    response = get_and_parse_response(url)
+    @token = response[:next_page_token]
+    response[:results]
   end
 
-  def default_types
-    TYPES.join('|')
+  def get_and_parse_response(url)
+    uri = URI.parse(url)
+    response = Net::HTTP.get(uri)
+    JSON.parse(response, symbolize_names: true)
   end
 
   def api_key

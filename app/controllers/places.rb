@@ -4,13 +4,11 @@ get '/places' do
     '41.387063,2.170655',
     1000
   )
+
   venues = results.map do |result|
     place_id = result[:place_id]
-    details = api_client.place_details(place_id)
-    venue = Venue.new(details)
-    # venue.category = GoogleScraper.new.category(venue.google_url)
-    # venue
+    Venue.find_by(place_id: place_id) || VenueBuilder.new(api_client, place_id).venue
   end
-  binding.pry
+
   venues.to_s
 end

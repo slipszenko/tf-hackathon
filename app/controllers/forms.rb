@@ -19,24 +19,17 @@ post '/return_form_one' do
     # {"friends_phones"=>"+34633623408,+34633623408", "name"=>"Edd", "phone"=>"+34633623408", "where"=>"Carrer de Trafalgar, Barcelona", "how_far"=>2}
 
     # TODO - Generate the new form based on the place and what's available here, following vars should be from places API
-    typesOfFood = {
-        "Spanish" => "10283092183", # Type => Google place ID
-        "Italian" => "23523553223",
-        "Disappointing" => "2523626236326",
-        "Indian" => "352352355353",
-        "French" => "124242142424"
-    }
+    typesOfFood = Category.with_best_venues
+        
+    choicesOptions = typesOfFood.keys.map { |key| { label: key } }
 
-    choicesOptions = [];
-    typesOfFood.each do |key, val|
-        choicesOptions.push({
-            "label" => key
-        })
-    end
+    open('shitlog.out', 'a') { |f|
+        f.puts choicesOptions
+    }
 
     newFormJson = JSON.generate({
         "title" => "Type of food",
-        "webhook_submit_url" => "https://5329d71b.ngrok.com/return_form_two",
+        "webhook_submit_url" => "#{ENV['PUBLIC_URL']}/return_form_two",
         "fields" => [
             "type" => "multiple_choice",
             "question" => "What type of food are you tempted by?",
@@ -122,15 +115,16 @@ post '/return_form_two' do
             possibleAnswers.push(answer.answer)
         end
 
-        winner = most_common_value(possibleAnswers)
+        winning_category_name = most_common_value(possibleAnswers)
 
-        # TODO - Get more details about the winner
+        # TODO - Get more details about the winning_category_name
         options = JSON.parse event.options
-        winnerDetails = options[winner]
+        place_id = options[winning_category_name]
+        winning_venue = Venue.find_by(place_id: place_id)
 
         open('shitlog2.out', 'a') { |f|
             f.puts "============ Winner Details ============"
-            f.puts winnerDetails
+            f.puts winning_venue.name
             f.puts "========================================"
         }
 
@@ -141,7 +135,7 @@ post '/return_form_two' do
             @client.messages.create(
                 from: ENV['FROM_PHONE_NUMBER'],
                 to: n,
-                body: "Dinner has been decided! But we can't tell you what you'll be having yet! But it was this category: " + winner
+                body: "Dinner has been decided! You can join your friends at #{winning_venue.name} and eat delicious #{winning_category_name} style food! See: #{winning_venue.google_url}"
             )
         end
     end
