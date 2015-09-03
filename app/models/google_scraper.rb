@@ -10,7 +10,7 @@ class GoogleScraper
   private
 
   def filter_categories(categories)
-    categories.each do |category|
+    categories.map do |category|
       if category == 'Bar'
         category
       else

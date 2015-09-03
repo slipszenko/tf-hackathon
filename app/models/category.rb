@@ -1,3 +1,4 @@
 class Category < ActiveRecord::Base
-  belongs_to :venue
+  has_many :categorizations
+  has_many :venues, through: :categorizations
 end
