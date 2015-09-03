@@ -15,7 +15,7 @@ class GoogleScraper
         category
       else
         split_category = category.split(' ')
-        split_category.first if split_category.last == 'Restaurant'
+        split_category[0] if split_category[1] == 'Restaurant'
       end
     end.compact
   end
