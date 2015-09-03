@@ -84,7 +84,12 @@ post '/return_form_one' do
 
     subscribers = friends.length
 
-    # TODO - Save the new form ID and the number of subscribers
+    Event.create(
+        form_id: formId,
+        n_subscribers: subscribers,
+        subscriber_phones: answers["friends_phones"],
+        options: JSON.generate(typesOfFood)
+    )
 
     'ok'
 end
@@ -96,16 +101,49 @@ post '/return_form_two' do
     form_id = data["uid"]
     answers = reformat_answers(data['answers'])
 
-    # TODO - Save the answers of the user, when the number of available answers for this key is the same as the number of
-    # subscribers then send out the SMSs with the results to all the other users
-    # Maybe delete all from the DB after...?
-
     # TODO - Remove this, it was just to get an idea of what's going on
     open('shitlog2.out', 'a') { |f|
         request.body.rewind  # In case someone already read it
         f.puts request.body.read
         f.puts answers
     }
+
+    EventsAnswers.create(
+        form_id: form_id,
+        answer: answers['food_choice']
+    )
+
+    event = Events.find_by(form_id: form_id)
+    answers = EventsAnswers.where(form_id: form_id)
+
+    if event.n_subscribers == answers.length
+        possibleAnswers = []
+        for answer in answers
+            possibleAnswers.push(answer.answer)
+        end
+
+        winner = most_common_value(possibleAnswers)
+
+        # TODO - Get more details about the winner
+        options = JSON.parse event.options
+        winnerDetails = options[winner]
+
+        open('shitlog2.out', 'a') { |f|
+            f.puts "============ Winner Details ============"
+            f.puts winnerDetails
+            f.puts "========================================"
+        }
+
+        # Send out the SMSs with the results to all the other users
+        friends = event.subscriber_phones.split(',')
+        friends.each do |n|
+            @client.messages.create(
+                from: ENV['FROM_PHONE_NUMBER'],
+                to: n,
+                body: "Dinner has been decided! But we can't tell you what you'll be having yet! But it was this category: " + winner
+            )
+        end
+    end
 
     'ok'
 end
@@ -117,9 +155,17 @@ def reformat_answers(oldAnswerFormat)
     for answer in oldAnswerFormat
         if answer['type'] == "number"
             answers[answer['tags'][0]] = answer['value']['amount']
+        elsif answer['type'] == "choice"
+            answers[answer['tags'][0]] = answer['value']['label']
         else
             answers[answer['tags'][0]] = answer['value']
         end
     end
     answers
+end
+
+def most_common_value(a)
+  a.group_by do |e|
+    e
+  end.values.max_by(&:size).first
 end
