@@ -3,20 +3,17 @@ get '/start' do
 end
 
 post '/return_form_one' do
-    return 'ok' # TODO - Remove this once typeform has caught up, so as not to burn Twilio credit
+    return 'ok' # Remove
 
     request.body.rewind  # In case someone already read it
     data = JSON.parse request.body.read
 
-    oldAnswerFormat = data['answers']
-    answers = {}
-    for answer in oldAnswerFormat
-        if answer['type'] == "number"
-            answers[answer['tags'][0]] = answer['value']['amount']
-        else
-            answers[answer['tags'][0]] = answer['value']
-        end
-    end
+    answers = reformat_answers(data['answers'])
+
+
+    open('shitlog.out', 'a') { |f|
+        f.puts answers
+    }
 
     # answers example:
     # {"friends_phones"=>"+34633623408,+34633623408", "name"=>"Edd", "phone"=>"+34633623408", "where"=>"Carrer de Trafalgar, Barcelona", "how_far"=>2}
@@ -43,6 +40,7 @@ post '/return_form_one' do
         "fields" => [
             "type" => "multiple_choice",
             "question" => "What type of food are you tempted by?",
+            "tags" => ["food_choice"],
             "description" => answers["name"] + " is really looking forward to dinner with you",
             "required" => true,
             "choices" => choicesOptions
@@ -95,6 +93,9 @@ post '/return_form_two' do
     request.body.rewind  # In case someone already read it
     data = JSON.parse request.body.read
 
+    form_id = data["uid"]
+    answers = reformat_answers(data['answers'])
+
     # TODO - Save the answers of the user, when the number of available answers for this key is the same as the number of
     # subscribers then send out the SMSs with the results to all the other users
     # Maybe delete all from the DB after...?
@@ -102,8 +103,23 @@ post '/return_form_two' do
     # TODO - Remove this, it was just to get an idea of what's going on
     open('shitlog2.out', 'a') { |f|
         request.body.rewind  # In case someone already read it
-        request.body.read
+        f.puts request.body.read
+        f.puts answers
     }
 
     'ok'
+end
+
+
+
+def reformat_answers(oldAnswerFormat)
+    answers = {}
+    for answer in oldAnswerFormat
+        if answer['type'] == "number"
+            answers[answer['tags'][0]] = answer['value']['amount']
+        else
+            answers[answer['tags'][0]] = answer['value']
+        end
+    end
+    answers
 end
