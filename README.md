@@ -14,8 +14,6 @@ restaurant within the searched area winning.
 
 ### Setup:
 
-```
 1.  Rename `.env.example` to `.env` and fill in the values
 2.  `bundle install`
 3.  `shotgun config.ru`
-```
