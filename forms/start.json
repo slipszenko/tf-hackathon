@@ -1,0 +1,34 @@
+{
+    "title": "Plan your night out",
+    "webhook_submit_url": "https://5329d71b.ngrok.com/return_form_one",
+    "fields": [{
+        "type": "short_text",
+        "tags": ["name"],
+        "question": "What's your name?",
+        "description": "https://www.youtube.com/watch?v=v1c2OfAzDTI",
+        "required": true
+    }, {
+        "type": "short_text",
+        "tags": ["phone"],
+        "question": "What's your phone number?",
+        "required": true
+    }, {
+        "type": "short_text",
+        "tags": ["where"],
+        "question": "Where are you going to be tonight?",
+        "description": "Use a street name and city if possible, if not just the city should be fine! :)",
+        "required": true
+    }, {
+        "type": "number",
+        "tags": ["how_far"],
+        "question": "How far are you willing to go from there?",
+        "description": "In KM",
+        "required": true
+    }, {
+        "type": "short_text",
+        "tags": ["friends_phones"],
+        "question": "What are you friend's numbers?",
+        "description": "Separated with commas, no spaces, with the country code, e.g. +34633123456. We're fussy, we know.",
+        "required": true
+    }]
+}
