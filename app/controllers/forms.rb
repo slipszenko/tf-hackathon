@@ -111,15 +111,16 @@ post '/return_form_two' do
             possibleAnswers.push(answer.answer)
         end
 
-        winner = most_common_value(possibleAnswers)
+        winning_category_name = most_common_value(possibleAnswers)
 
-        # TODO - Get more details about the winner
+        # TODO - Get more details about the winning_category_name
         options = JSON.parse event.options
-        winnerDetails = options[winner]
+        place_id = options[winning_category_name]
+        winning_venue = Venue.find_by(place_id: place_ud])
 
         open('shitlog2.out', 'a') { |f|
             f.puts "============ Winner Details ============"
-            f.puts winnerDetails
+            f.puts winning_venue.name
             f.puts "========================================"
         }
 
@@ -130,7 +131,7 @@ post '/return_form_two' do
             @client.messages.create(
                 from: ENV['FROM_PHONE_NUMBER'],
                 to: n,
-                body: "Dinner has been decided! But we can't tell you what you'll be having yet! But it was this category: " + winner
+                body: "Dinner has been decided! You can join your friends at #{winning_venue.name} and eat delicious #{winning_category_name} style food! See: #{winning_venue.url}"
             )
         end
     end
