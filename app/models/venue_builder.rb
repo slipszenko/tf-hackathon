@@ -12,7 +12,7 @@ class VenueBuilder
     venue = Venue.new
     venue.set_attributes(
       details.merge(categories: categories)
-    ).save
+    )
     venue
   end
 end

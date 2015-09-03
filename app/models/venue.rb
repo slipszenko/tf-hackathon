@@ -2,24 +2,25 @@ class Venue < ActiveRecord::Base
   has_many :categorizations
   has_many :categories, through: :categorizations
 
-  before_create :initialize_categories
-
   def set_attributes(data)
+
     initialize_categories(data[:categories])
-    self.address = data[:formatted_address]
-    self.name = data[:name]
-    self.opening_hours = data[:opening_hours][:periods]
-    self.phone = data[:international_phone_number]
-    self.place_id = data[:place_id]
-    self.rating = data[:rating]
-    self.google_url = data[:url]
-    self.website = data[:website]
+    update(
+      address: data[:formatted_address],
+      name: data[:name],
+      # opening_hours: data[:opening_hours][:periods],
+      phone: data[:international_phone_number],
+      place_id: data[:place_id],
+      rating: data[:rating],
+      google_url: data[:url],
+      website: data[:website]
+    )
   end
 
-  def open?(datetime)
-    day = datetime.wday
-    time = "#{datetime.hour}#{datetime.min}"
-  end
+  # def open?(datetime)
+  #   day = datetime.wday
+  #   time = "#{datetime.hour}#{datetime.min}"
+  # end
 
   private
 
