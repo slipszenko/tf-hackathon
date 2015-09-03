@@ -19,20 +19,9 @@ post '/return_form_one' do
     # {"friends_phones"=>"+34633623408,+34633623408", "name"=>"Edd", "phone"=>"+34633623408", "where"=>"Carrer de Trafalgar, Barcelona", "how_far"=>2}
 
     # TODO - Generate the new form based on the place and what's available here, following vars should be from places API
-    typesOfFood = {
-        "Spanish" => "10283092183", # Type => Google place ID
-        "Italian" => "23523553223",
-        "Disappointing" => "2523626236326",
-        "Indian" => "352352355353",
-        "French" => "124242142424"
-    }
+    typesOfFood = Category.with_best_venues
 
-    choicesOptions = [];
-    typesOfFood.each do |key, val|
-        choicesOptions.push({
-            "label" => key
-        })
-    end
+    choicesOptions = typesOfFood.keys.map { |key| { label: key } }
 
     newFormJson = JSON.generate({
         "title" => "Type of food",
