@@ -1,24 +1,3 @@
-# myapp.rb
-require 'rubygems'
-require 'bundler/setup'
-
-require 'sinatra'
-require 'dotenv'
-require 'typeform'
-require 'twilio-ruby'
-require 'net/http'
-
-Dotenv.load
-
-Twilio.configure do |config|
-  config.account_sid = ENV['TWILIO_SID']
-  config.auth_token = ENV['TWILIO_AUTH_TOKEN']
-end
-
-get '/' do
-    redirect '/start'
-end
-
 get '/start' do
     erb :first
 end
