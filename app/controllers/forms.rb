@@ -29,7 +29,7 @@ post '/return_form_one' do
 
     newFormJson = JSON.generate({
         "title" => "Type of food",
-        "webhook_submit_url" => "https://5329d71b.ngrok.com/return_form_two",
+        "webhook_submit_url" => "#{ENV['PUBLIC_URL']}/return_form_two",
         "fields" => [
             "type" => "multiple_choice",
             "question" => "What type of food are you tempted by?",
