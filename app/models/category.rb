@@ -9,3 +9,4 @@ class Category < ActiveRecord::Base
     cats_and_venues
   end
 end
+
