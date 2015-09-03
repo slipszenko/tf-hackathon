@@ -1,11 +1,15 @@
 source 'https://rubygems.org'
 
+gem 'activerecord'
+gem 'activesupport'
+gem 'dotenv'
+gem 'nokogiri'
+gem 'pg'
+gem 'pry'
+gem 'rake'
+gem 'rspec'
+gem 'shotgun'
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'shotgun'
-gem 'typeform'
-
-gem 'pry'
-
 gem 'twilio-ruby', '~> 4.2.1'
-gem 'dotenv'
+gem 'typeform'
