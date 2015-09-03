@@ -3,7 +3,7 @@ get '/start' do
 end
 
 post '/return_form_one' do
-    return 'ok' # Remove
+    #return 'ok' # Remove
 
     request.body.rewind  # In case someone already read it
     data = JSON.parse request.body.read
@@ -113,7 +113,7 @@ post '/return_form_two' do
         answer: answers['food_choice']
     )
 
-    event = Events.find_by(form_id: form_id)
+    event = Event.find_by(form_id: form_id)
     answers = EventsAnswers.where(form_id: form_id)
 
     if event.n_subscribers == answers.length
@@ -136,6 +136,7 @@ post '/return_form_two' do
 
         # Send out the SMSs with the results to all the other users
         friends = event.subscriber_phones.split(',')
+        @client = Twilio::REST::Client.new
         friends.each do |n|
             @client.messages.create(
                 from: ENV['FROM_PHONE_NUMBER'],
